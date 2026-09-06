@@ -1,7 +1,7 @@
-name: Build Libbox & IPA
+name: Build Libbox Framework
 
 on:
-  workflow_dispatch: # Cho phép bấm chạy thủ công từ giao diện GitHub
+  workflow_dispatch:
 
 jobs:
   build-framework:
@@ -21,18 +21,26 @@ jobs:
           go install golang.org/x/mobile/cmd/gomobile@latest
           gomobile init
           
-          # Clone sing-box và biên dịch framework
+          # Clone mã nguồn sing-box
           git clone https://github.com/SagerNet/sing-box.git singbox-src
           cd singbox-src
+
+          # Thêm dependency x/mobile để sửa lỗi gomobile bind
+          go get golang.org/x/mobile@latest
+          
+          # Đảm bảo tạo sẵn thư mục chứa framework
+          mkdir -p ../SingBoxEngine
+
+          # Build framework vào đúng đường dẫn SingBoxEngine/
           gomobile bind -v -target=ios,iossimulator -iosversion=15.0 -o ../SingBoxEngine/Libbox.xcframework ./experimental/libbox
           cd ..
 
-      - name: Verify Framework
+      - name: Verify Framework Structure
         run: |
           if [ -d "SingBoxEngine/Libbox.xcframework" ]; then
-            echo "Libbox.xcframework đã tạo thành công!"
+            echo "SUCCESS: Libbox.xcframework đã được tạo tại SingBoxEngine/"
           else
-            echo "Tạo framework thất bại!" && exit 1
+            echo "ERROR: Không tìm thấy Libbox.xcframework!" && exit 1
           fi
 
       - name: Upload Libbox Artifact
