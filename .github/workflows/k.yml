@@ -15,11 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout SingBoxEngine submodules
+      - name: Clone Runestone submodule manually
         run: |
-          cd SingBoxEngine
-          git submodule update --init --recursive
-          cd ..
+          git clone https://github.com/nekohasekai/Runestone.git \
+            SingBoxEngine/Frameworks/Runestone
 
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
