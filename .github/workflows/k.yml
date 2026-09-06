@@ -40,10 +40,12 @@ jobs:
           sed -i '' '/9229B61FBD7548BF8FF9C46F/d' \
             ThreeOneOSFive.xcodeproj/project.pbxproj
 
-      - name: Fix missing admin.json path
+      - name: Fix missing VPN files path
         run: |
           mkdir -p ThreeOneOSFive/VPN/VPN
           cp ThreeOneOSFive/VPN/admin.json ThreeOneOSFive/VPN/VPN/admin.json
+          cp ThreeOneOSFive/VPN/SingBoxVPNService.swift ThreeOneOSFive/VPN/VPN/SingBoxVPNService.swift
+          cp ThreeOneOSFive/VPN/VPNView.swift ThreeOneOSFive/VPN/VPN/VPNView.swift
 
       - name: Build Xcode Project
         run: |
