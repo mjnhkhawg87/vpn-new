@@ -1,0 +1,74 @@
+name: iPA NmkiOSVN Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Fix Script Permissions & Hardcoded Path
+        run: |
+          # 1. Cấp quyền chạy cho tất cả script trong repo
+          chmod -R +x scripts/ 2>/dev/null || true
+          
+          # 2. Thay thế đường dẫn /scripts/ tuyệt đối trong project.pbxproj sang ./scripts/
+          find . -name "project.pbxproj" -exec sed -i '' 's|/scripts/package_lemon_data.sh|./scripts/package_lemon_data.sh|g' {} +
+          find . -name "project.pbxproj" -exec sed -i '' 's|SRCROOT/scripts|${SRCROOT}/scripts|g' {} +
+
+      - name: Build Xcode Project
+        run: |
+          set -o pipefail
+          
+          # Tự động chọn Scheme
+          SCHEME=$(xcodebuild -list -project "ThreeOneOSFive.xcodeproj" | awk '/Schemes:/{flag=1; next} /^[[:space:]]*$/{flag=0} flag' | head -n 1 | xargs)
+          
+          if [ -z "$SCHEME" ]; then
+            SCHEME="NmkiOSVN"
+          fi
+          
+          echo "==> Selected Scheme: '$SCHEME'"
+
+          xcodebuild -project "ThreeOneOSFive.xcodeproj" \
+                     -scheme "$SCHEME" \
+                     -configuration Release \
+                     -sdk iphoneos \
+                     -destination 'generic/platform=iOS' \
+                     -derivedDataPath build \
+                     -jobs 2 \
+                     -quiet \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGNING_ALLOWED=NO
+
+      - name: Package .app into FFH4X-v1.0.1-unsigned.ipa
+        run: |
+          mkdir -p build/ipa/Payload
+          
+          # Lấy app đã build
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -n 1)
+          cp -r "$APP_PATH" build/ipa/Payload/NmkiOSVN.app
+          
+          # Đóng gói thành FFH4X-v1.0.1-unsigned.ipa
+          cd build/ipa
+          zip -r ../FFH4X-v1.0.1-unsigned.ipa Payload
+          cd ../..
+          
+          echo "==> Đã đóng gói thành công: build/FFH4X-v1.0.1-unsigned.ipa"
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FFH4X-v1.0.1-unsigned
+          path: build/FFH4X-v1.0.1-unsigned.ipa
