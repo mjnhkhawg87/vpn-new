@@ -36,14 +36,16 @@ jobs:
       - name: Resolve Package Dependencies
         run: |
           xcodebuild -project "SingBoxEngine/sing-box.xcodeproj" \
+                     -scheme "SFI" \
                      -resolvePackageDependencies \
                      -derivedDataPath build
 
-      - name: Build Library.framework (target trực tiếp)
+      - name: Build Library.framework
         run: |
           set -o pipefail
 
           xcodebuild -project "SingBoxEngine/sing-box.xcodeproj" \
+                     -scheme "SFI" \
                      -target "Library" \
                      -configuration Release \
                      -sdk iphoneos \
