@@ -33,11 +33,12 @@ jobs:
           find . -name "project.pbxproj" -exec sed -i '' 's|/scripts/package_lemon_data.sh|./scripts/package_lemon_data.sh|g' {} +
           find . -name "project.pbxproj" -exec sed -i '' 's|SRCROOT/scripts|${SRCROOT}/scripts|g' {} +
 
-      - name: Copy prebuilt Library.framework to build output
+      - name: Fix Library.framework reference in project
         run: |
-          mkdir -p build/Build/Products/Release-iphoneos
-          cp -r SingBoxEngine/prebuilt/Library.framework \
-            build/Build/Products/Release-iphoneos/Library.framework
+          sed -i '' '/B9074C51B8214A6B9CB3C152/d' \
+            ThreeOneOSFive.xcodeproj/project.pbxproj
+          sed -i '' '/9229B61FBD7548BF8FF9C46F/d' \
+            ThreeOneOSFive.xcodeproj/project.pbxproj
 
       - name: Build Xcode Project
         run: |
@@ -61,6 +62,12 @@ jobs:
                      CODE_SIGN_IDENTITY="" \
                      CODE_SIGNING_REQUIRED=NO \
                      CODE_SIGNING_ALLOWED=NO
+
+      - name: Inject Library.framework into .app bundle
+        run: |
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" | head -n 1)
+          mkdir -p "$APP_PATH/Frameworks"
+          cp -r SingBoxEngine/prebuilt/Library.framework "$APP_PATH/Frameworks/"
 
       - name: Package .app into FFH4X-v1.0.1-unsigned.ipa
         run: |
