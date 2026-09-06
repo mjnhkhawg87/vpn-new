@@ -20,8 +20,12 @@ jobs:
           git clone https://github.com/nekohasekai/Runestone.git \
             SingBoxEngine/Frameworks/Runestone
 
-      - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+      - name: Select latest Xcode
+        run: |
+          XCODE=$(ls /Applications/ | grep "^Xcode_" | sort -V | tail -1)
+          sudo xcode-select -s /Applications/$XCODE/Contents/Developer
+          echo "Using: $XCODE"
+          swift --version
 
       - name: Fix Script Permissions & Hardcoded Path
         run: |
