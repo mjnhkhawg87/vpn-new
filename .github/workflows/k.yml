@@ -33,28 +33,11 @@ jobs:
           find . -name "project.pbxproj" -exec sed -i '' 's|/scripts/package_lemon_data.sh|./scripts/package_lemon_data.sh|g' {} +
           find . -name "project.pbxproj" -exec sed -i '' 's|SRCROOT/scripts|${SRCROOT}/scripts|g' {} +
 
-      - name: Resolve Package Dependencies
+      - name: Copy prebuilt Library.framework to build output
         run: |
-          xcodebuild -project "SingBoxEngine/sing-box.xcodeproj" \
-                     -scheme "SFI" \
-                     -resolvePackageDependencies \
-                     -derivedDataPath build
-
-      - name: Build Library.framework
-        run: |
-          set -o pipefail
-
-          xcodebuild -project "SingBoxEngine/sing-box.xcodeproj" \
-                     -scheme "SFI" \
-                     -target "Library" \
-                     -configuration Release \
-                     -sdk iphoneos \
-                     -destination 'generic/platform=iOS' \
-                     -derivedDataPath build \
-                     -jobs 2 \
-                     CODE_SIGN_IDENTITY="" \
-                     CODE_SIGNING_REQUIRED=NO \
-                     CODE_SIGNING_ALLOWED=NO
+          mkdir -p build/Build/Products/Release-iphoneos
+          cp -r SingBoxEngine/prebuilt/Library.framework \
+            build/Build/Products/Release-iphoneos/Library.framework
 
       - name: Build Xcode Project
         run: |
