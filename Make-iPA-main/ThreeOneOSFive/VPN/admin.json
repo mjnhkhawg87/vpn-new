@@ -1,0 +1,40 @@
+{
+  // Make By Minh Khang
+  // Telegram: @nmkiosvn
+  // Zalo: 0869641898
+  "log": { "level": "warn", "timestamp": true },
+  "dns": {
+    "servers": [{ "type": "local", "tag": "local" }],
+    "rules": [
+      { "domain": ["login.common.freefiremobile.com", "client.common.freefiremobile.com", "version.common.freefiremobile.com", "auth.garena.com", "accounts.google.com", "accounts.youtube.com", "oauth2.googleapis.com", "oauthaccountmanager.googleapis.com"], "action": "route", "server": "local" },
+      { "domain_suffix": ["googleapis.com", "gstatic.com", "googleusercontent.com"], "action": "route", "server": "local" },
+      { "domain_suffix": ["freefiremobile.com", "freefireth.com", "ff.garena.com"], "action": "reject", "method": "default", "no_drop": true }
+    ],
+    "final": "local",
+    "strategy": "ipv4_only"
+  },
+  "inbounds": [{
+    "type": "tun",
+    "tag": "tun-in",
+    "address": ["172.19.0.1/30"],
+    "auto_route": true,
+    "stack": "mixed",
+    "dns_mode": "hijack",
+    "route_exclude_address": ["10.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8", "169.254.0.0/16", "172.16.0.0/12", "192.0.0.0/24", "192.0.2.0/24", "192.88.99.0/24", "192.168.0.0/16", "198.18.0.0/15", "198.51.100.0/24", "203.0.113.0/24", "224.0.0.0/4", "239.255.255.250/32", "255.255.255.255/32"]
+  }],
+  "outbounds": [{ "type": "direct", "tag": "direct" }],
+  "route": {
+    "auto_detect_interface": true,
+    "rules": [
+      { "protocol": "dns", "action": "hijack-dns" },
+      { "action": "sniff", "sniffer": ["http", "tls", "quic"], "timeout": "1s" },
+      { "domain": ["login.common.freefiremobile.com", "client.common.freefiremobile.com", "version.common.freefiremobile.com", "auth.garena.com", "accounts.google.com", "accounts.youtube.com", "oauth2.googleapis.com", "oauthaccountmanager.googleapis.com"], "action": "route", "outbound": "direct" },
+      { "domain_suffix": ["googleapis.com", "gstatic.com", "googleusercontent.com"], "action": "route", "outbound": "direct" },
+      { "domain_suffix": ["freefiremobile.com", "freefireth.com", "ff.garena.com"], "action": "reject", "method": "default", "no_drop": true },
+      { "domain": ["client.ind.freefiremobile.com", "client.advance.freefiremobile.com", "ff.rtc.grtc.garenanow.com", "ff.sdk.grtc.garenanow.com", "ff.dr.grtc.garenanow.com", "dl.cdn.freefiremobile.com", "dl.dir.freefiremobile.com", "dl.aw.freefiremobile.com", "dl.castle.freefiremobile.com", "dl.ctl.freefiremobile.com", "dl.ctlin.freefiremobile.com", "dl.cvs.freefiremobile.com", "dl.gmc.freefiremobile.com", "dl.gcp.freefiremobile.com", "dl.hw.freefiremobile.com", "dl.ks.freefiremobile.com", "cdn.garenanow.com", "dl.garenanow.com", "cdn.gxx.garenanow.com", "dl.hdltw.garenanow.com", "gin.freefiremobile.com", "common.freefiremobile.com"], "action": "reject", "method": "default", "no_drop": true },
+      { "ip_is_private": true, "action": "route", "outbound": "direct" }
+    ],
+    "final": "direct"
+  },
+  "experimental": { "cache_file": { "enabled": true } }
+}
