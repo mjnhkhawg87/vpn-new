@@ -1,50 +1,49 @@
-name: Build Libbox Framework
+name: Build Library.framework
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-framework:
-    runs-on: macos-14
+  build:
+    runs-on: macos-15
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
-
-      - name: Install Gomobile & Build Libbox.xcframework
+      - name: Clone Runestone
         run: |
-          go install golang.org/x/mobile/cmd/gomobile@latest
-          gomobile init
-          
-          # Clone mã nguồn sing-box
-          git clone https://github.com/SagerNet/sing-box.git singbox-src
-          cd singbox-src
+          git clone https://github.com/nekohasekai/Runestone.git \
+            SingBoxEngine/Frameworks/Runestone
 
-          # Thêm dependency x/mobile để sửa lỗi gomobile bind
-          go get golang.org/x/mobile@latest
-          
-          # Đảm bảo tạo sẵn thư mục chứa framework
-          mkdir -p ../SingBoxEngine
-
-          # Build framework vào đúng đường dẫn SingBoxEngine/
-          gomobile bind -v -target=ios,iossimulator -iosversion=15.0 -o ../SingBoxEngine/Libbox.xcframework ./experimental/libbox
-          cd ..
-
-      - name: Verify Framework Structure
+      - name: Select latest Xcode
         run: |
-          if [ -d "SingBoxEngine/Libbox.xcframework" ]; then
-            echo "SUCCESS: Libbox.xcframework đã được tạo tại SingBoxEngine/"
-          else
-            echo "ERROR: Không tìm thấy Libbox.xcframework!" && exit 1
-          fi
+          XCODE=$(ls /Applications/ | grep "^Xcode_" | sort -V | tail -1)
+          sudo xcode-select -s /Applications/$XCODE/Contents/Developer
+          echo "Using: $XCODE"
 
-      - name: Upload Libbox Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Libbox.xcframework
-          path: SingBoxEngine/Libbox.xcframework
+      - name: Build Library.framework
+        run: |
+          set -o pipefail
+          xcodebuild -project "SingBoxEngine/sing-box.xcodeproj" \
+                     -scheme "SFI" \
+                     -configuration Release \
+                     -sdk iphoneos \
+                     -destination 'generic/platform=iOS' \
+                     -derivedDataPath build \
+                     -jobs 2 \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGNING_ALLOWED=NO
+
+      - name: Copy & Commit Library.framework to repo
+        run: |
+          mkdir -p SingBoxEngine/prebuilt
+          cp -r build/Build/Products/Release-iphoneos/Library.framework \
+            SingBoxEngine/prebuilt/Library.framework
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add SingBoxEngine/prebuilt/Library.framework
+          git commit -m "Add prebuilt Library.framework"
+          git push
