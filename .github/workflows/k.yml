@@ -14,8 +14,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      - name: Checkout SingBoxEngine submodules
+        run: |
+          cd SingBoxEngine
+          git submodule update --init --recursive
+          cd ..
 
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
