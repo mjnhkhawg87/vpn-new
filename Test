@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "identifier": "com.mhieuushinn.shinncheat",
+  "name": "Shinn Cheat Share",
+  "description": "Telegram: @ShinnThieuu",
+  "accentColor": "#000000",
+  "icon": "https://raw.githubusercontent.com/mhieuushinn-dev/ShinnCheat/main/IMG_20260819005845878.png",
+  "packages": [
+    {
+      "identifier": "com.shinn.menuffth",
+      "name": "Menu FFTH",
+      "author": "Shinn Cheat",
+      "version": "2009",
+      "summary": "Menu Free Fire",
+      "description": "Feedback Báo lỗi Telegram Admin ShinnThieuu. Tất cả file và repo đều FREE, nếu bạn mua chúng bạn đã bị lừa. Khi bạn sử dụng repo là bạn đã chấp nhận điều khoản của chúng tôi, không chịu trách nhiệm dưới mọi hình thức. Cảm ơn đã đọc, xin cảm ơn. Donate: 104877777 Mb Bank",
+      "category": "Free Fire",
+      "tags": [
+        "Free Fire",
+        "Menu"
+      ],
+      "publishedAt": "2026-09-21T00:00:00Z",
+      "download": "Tester.3105",
+      "sha256": "10f9c8264e665b64f2892eb91308399cc154ac5ddcd5ced74f0cd2193afa5099",
+      "size": 21530,
+      "supportedOS": [
+        {
+          "minimum": "17.0",
+          "maximum": "18.7.1"
+        },
+        {
+          "minimum": "26.0",
+          "maximum": "26.6.1"
+        },
+        {
+          "minimum": "27.0",
+          "maximum": "27.0",
+          "builds": [
+            "24A5355q",
+            "24A5370h",
+            "24A5380h",
+            "24A5390f"
+          ]
+        }
+      ],
+      "featured": false,
+      "isPrivate": false,
+      "icon": "https://raw.githubusercontent.com/mhieuushinn-dev/ShinnCheatShare/main/IMG_0508.jpeg"
+    }
+  ]
+}
